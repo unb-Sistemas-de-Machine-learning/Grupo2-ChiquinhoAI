@@ -63,5 +63,6 @@ A arquitetura segue o modelo RAG, Retrieval-Augmented Generation, que combina re
 | Data       | Versão | Descrição            | Autores                                   |
 |------------|--------|----------------------|-------------------------------------------|
 | 06/10/2025 | `1.0`  | Criação do documento | [João Ginuino](https://github.com/i-JSS) |
+| 21/10/2025 | `1.1`  | Adiciona justificativa | [João Ginuino](https://github.com/i-JSS) |
 
 </div>
