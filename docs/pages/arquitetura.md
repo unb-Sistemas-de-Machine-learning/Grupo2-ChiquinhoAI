@@ -41,6 +41,17 @@ A arquitetura segue o modelo RAG, Retrieval-Augmented Generation, que combina re
 
 ---
 
+#### Justificativas
+
+- **Qdrant** — Utilizado para o armazenamento e tratamento de dados em bancos vetoriais, possibilitando consultas semânticas e operações de similaridade entre embeddings.
+- **Gemini Pro** — Modelo de linguagem (LLM) disponibilizado gratuitamente para estudantes, oferecendo alto desempenho em tarefas de processamento de linguagem natural e integração simples com outras ferramentas.
+- **Telegram Bot API** — Facilita a interação com os usuários por meio de um bot no Telegram, permitindo chamadas simplificadas e desacoplando o sistema de um frontend dedicado.
+- **BeautifulSoup (Python)** — Biblioteca utilizada para web scraping e manipulação de páginas HTML. Após a captura do código HTML bruto, o BeautifulSoup possibilita o tratamento dinâmico do conteúdo, facilitando a busca e extração de arquivos (como PDFs).
+- **Backend (Python 3.12)** — Escolhido pela fácil integração com o Qdrant, o web scraper e a API do Telegram. A linguagem Python oferece ampla compatibilidade, legibilidade e suporte a bibliotecas voltadas a automação e análise de dados, tornando-a ideal para este projeto.
+
+
+---
+
 <center>
 
 ## Histórico de Versão
