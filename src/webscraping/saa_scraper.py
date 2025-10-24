@@ -123,7 +123,9 @@ def scrape_all() -> List[Dict[str, Any]]:
     return all_data
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     dados = scrape_all()
-    with open("saa_content.json", "w", encoding="utf-8") as f:
+    with open("saa.json", "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)
-    logger.info("Feito! Conteúdo salvo em saa_content.json")
+    logger.info("Feito! Conteúdo salvo em saa.json")

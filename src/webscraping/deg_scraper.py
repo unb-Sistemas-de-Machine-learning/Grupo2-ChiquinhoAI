@@ -113,7 +113,9 @@ def scrape_all(query="monitoria", pages_limit=1):
     return all_data
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
     dados = scrape_all(query="monitoria", pages_limit=1)
-    with open("deg_monitoria_all.json", "w", encoding="utf-8") as f:
+    with open("deg.json", "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)
-    logger.info("Feito! Dados do DEG salvos.")
+    logger.info("Feito! Conteúdo salvo em deg.json")
