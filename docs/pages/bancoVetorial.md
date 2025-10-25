@@ -43,6 +43,8 @@ O diferencial do Qdrant é que ele não procura por palavras exatas, como um ban
 No fim das contas, o Qdrant é o que faz a ligação entre a pergunta e o conhecimento real que está nos PDFs. Ele localiza os trechos mais relevantes e envia para o Gemini, que então monta uma resposta completa e coerente.
 </div>
 
+---
+
 #### Embeddings: O Que São?
 
 <div align="justify">
