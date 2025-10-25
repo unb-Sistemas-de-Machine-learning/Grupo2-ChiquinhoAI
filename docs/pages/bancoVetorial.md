@@ -30,6 +30,18 @@ O Qdrant é amplamente utilizado em aplicações de IA, como busca semântica, r
 </div>
 
 ---
+#### O papel do Qdrant no sistema
+
+<div align="justify">
+
+O Qdrant é uma parte central do projeto, porque é ele que guarda e organiza as informações retiradas dos PDFs da UnB. Ele funciona como uma espécie de “memória” do sistema, permitindo que o chatbot encontre as respostas certas nos documentos.
+
+A arquitetura usada é o modelo RAG (Retrieval-Augmented Generation). Nesse tipo de sistema, o Qdrant cuida da parte de busca das informações, enquanto o modelo de linguagem (neste caso, o Gemini) é responsável por gerar a resposta final. Dá para pensar no Gemini como alguém que sabe conversar e explicar as coisas, mas que não tem os documentos guardados com ele. Já o Qdrant é como uma biblioteca organizada, onde o sistema vai procurar os trechos que contêm a informação pedida pelo usuário.
+
+O diferencial do Qdrant é que ele não procura por palavras exatas, como um banco de dados comum. Ele usa vetores que representam o sentido das frases. Isso significa que se um usuário perguntar "Como eu faço para falar com a reitoria?", o sistema pode localizar um documento que diga "Os canais de atendimento do gabinete do reitor são o e-mail X e o telefone Y", mesmo que as palavras exatas não sejam as mesmas, pois ele entende que "falar com" é semanticamente similar a "canais de atendimento".
+
+No fim das contas, o Qdrant é o que faz a ligação entre a pergunta e o conhecimento real que está nos PDFs. Ele localiza os trechos mais relevantes e envia para o Gemini, que então monta uma resposta completa e coerente.
+</div>
 
 #### Embeddings: O Que São?
 

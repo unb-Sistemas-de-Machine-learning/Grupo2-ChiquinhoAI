@@ -56,72 +56,38 @@ Quando o usuário envia uma pergunta, o fluxo é o seguinte:
 
 ---
 
+## 3. Estratégia de Testes e Avaliação
 
-## 3. Abordagem de Dados e Engenharia
+Para garantir que o chatbot forneça respostas precisas e confiáveis, nossa estratégia de testes é dividida para avaliar os dois componentes centrais da arquitetura RAG: a *Recuperação* (se encontramos os documentos corretos) e a *Geração* (se a resposta gerada é boa), além de um teste completo de ponta-a-ponta.
 
-### 3.1. Coleta e armazenamento de dados
 
-- Os PDFs são coletados automaticamente pelo WebScraper e salvos em uma pasta localS.  
-- O Qdrant armazena os vetores, trechos de texto e metadados (nome do arquivo, página e caminho local).  
-- Essa estrutura permite consultas rápidas sem armazenar os arquivos binários no banco de dados.
+### 3.1. Avaliação da Recuperação (Retrieval)
 
----
+O primeiro passo da avaliação é garantir que o sistema realmente encontre os trechos de texto corretos nos documentos. Se essa parte falhar, toda a resposta do chatbot será comprometida.
 
-### 3.2. Amostragem de dados
+* **Objetivo:** Verificar se o modelo de embedding e o Qdrant estão funcionando bem, ou seja, se o sistema consegue identificar os trechos de texto mais relevantes para cada pergunta.
+* **Como foi feito:** Criamos um pequeno conjunto de testes (chamado *Golden Set*) com pares de pergunta e o contexto esperado. Esse contexto esperado não é o texto em si, mas os metadados do trecho onde a resposta está (por exemplo, `arquivo: "calendario_academico.pdf"`).
+* **Execução:** Um script automatizado envia as perguntas para o sistema, recupera os cinco trechos mais próximos e verifica se o contexto esperado aparece entre eles.
+* **Métricas usadas:**
+    * **Taxa de acerto (Hit Rate @5):** Mede quantas vezes o trecho correto apareceu entre os cinco resultados retornados.
+    * **MRR (Mean Reciprocal Rank):** Avalia a posição em que o trecho certo aparece — quanto mais no topo, melhor.
 
-- Nenhuma amostragem foi aplicada, garantindo que todo o conteúdo disponível seja indexado.
+### 3.2. Avaliação da Geração (Generation)
 
----
+Depois de garantir que o sistema está encontrando os trechos certos, o próximo passo é ver se o modelo de linguagem (Gemini) está usando bem essas informações para responder corretamente.
 
-### 3.3. Rotulação de dados
+* **Objetivo:** Verificar se o Gemini consegue gerar respostas coerentes e fiéis, baseando-se apenas no contexto que recebeu.
+* **Como foi feito:** Usamos um conjunto de perguntas com os contextos corretos e analisamos as respostas geradas.
+* **Critérios avaliados:**
+    * **Fidelidade:** A resposta está realmente baseada no texto fornecido, sem inventar informações?
+    * **Relevância:** A resposta atende diretamente ao que foi perguntado?
 
-- Não houve necessidade de rotulação manual.  
-- Os embeddings permitem identificar automaticamente os trechos mais relevantes para cada pergunta.
+### 3.3. Avaliação de Ponta a Ponta (End-to-End)
 
----
+Por fim, realizamos um teste completo, simulando a experiência real do usuário — desde a pergunta no Telegram até a resposta final do sistema.
 
-### 3.4. Balanceamento de classes
-
-- Não se aplica, pois o sistema não realiza tarefas de classificação.  
-- A distribuição desigual de documentos reflete apenas o acervo real da UnB.
-
----
-
-### 3.5. Falta de dados e estratégias de expansão
-
-- Se algum tema estiver pouco representado, a solução é melhorar a coleta de dados e identificar novas fontes de PDFs.
-
----
-
-### 3.6. Feature Engineering
-
-- Missing values: PDFs corrompidos ou páginas em branco são descartados.  
-- Outliers: Trechos irrelevantes ou muito curtos são filtrados.  
-- Enriquecimento: Cada ponto no Qdrant inclui vetor, texto e metadados (arquivo, página, caminho, data de coleta):
-    ```json
-    {
-      "texto": "O prazo para trancamento é dia 10...",
-      "vetor": [0.12, 0.45, ...],
-      "metadados": {
-          "arquivo": "calendario_academico_2025.pdf",
-          "pagina": 4,
-          "caminho": "media/pdf/calendario_academico_2025.pdf",
-          "data_coleta": "2025-10-18"
-      }
-    }
-    ```
-- Remoção de informações irrelevantes: Cabeçalhos, rodapés e padrões repetitivos são eliminados.  
-- Normalização e padronização: Texto limpo e vetores normalizados.  
-- One-hot encoding: Não utilizado; embeddings representam significado e relações entre palavras.
-
----
-
-### 3.7. Dados de treinamento e avaliação
-
-- A ingestão dos PDFs funciona como “treinamento” do sistema.  
-- Para avaliação, um conjunto de teste com pares `(Pergunta, Resposta Esperada)` é utilizado.  
-- Um script compara respostas reais com as esperadas, permitindo ajustes nos parâmetros.
-
-**Exemplo de teste:**  
-- Pergunta: “Qual o prazo para trancar disciplina?”  
-- Resposta esperada: “O prazo é dia 10 de novembro, conforme o Calendário Acadêmico.”
+* **Objetivo:** Avaliar o desempenho do sistema como um todo, verificando se a resposta final é correta e útil.
+* **Como foi feito:** Criamos pares de pergunta e resposta esperada. O script envia as perguntas ao bot e compara as respostas obtidas com as esperadas.
+* **Métricas utilizadas:**
+    * **Similaridade semântica:** Como o modelo pode usar palavras diferentes, não comparamos os textos de forma exata. Transformamos as respostas (a esperada e a real) em vetores e calculamos a similaridade de cosseno entre eles. Se for alta (por exemplo, acima de 0.9), o teste é considerado bem-sucedido.
+    * **LLM como avaliador:** Para uma análise mais refinada, usamos um modelo de linguagem (como o Gemini 1.5 Pro) para comparar as respostas e decidir se a resposta gerada é satisfatória.
