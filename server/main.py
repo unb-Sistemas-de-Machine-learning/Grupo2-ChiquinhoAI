@@ -1,17 +1,36 @@
 from fastapi import FastAPI
-from qdrant_client import QdrantClient
+from fastapi.middleware.cors import CORSMiddleware
+from qdrant import Qdrant
+from llm import LLM
+import uvicorn
 import os
 
-app = FastAPI()
+class ServerApp:
+    def __init__(self, qdrant, llm):
+        self.app = FastAPI()
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
-qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
-qdrant = QdrantClient(url=qdrant_url)
+        self.__qdrant = qdrant
+        self.__llm = llm
+        self.routes()
 
-@app.get("/")
-def root():
-    return {"msg": "Servidor Python conectado ao Qdrant!"}
+    def routes(self):
+        @self.app.get("/response")
+        def get_resposta(pergunta: str):
+            print(f"Pergunta recebida: {pergunta}")
+            dados = self.__qdrant.find_data(pergunta)
+            resposta = self.__llm.request(pergunta, dados)
+            return {"resposta": resposta}
 
-@app.get("/collections")
-def get_collections():
-    collections = qdrant.get_collections()
-    return collections.dict()
+server = ServerApp(Qdrant(), LLM())
+app = server.app
+
+if __name__ == "__main__":
+    port = int(os.getenv("SERVER_PORT", 55555))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
