@@ -37,6 +37,23 @@ services:
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
 
+  webscraper:
+    build:
+      context: ./webscraper
+      dockerfile: Dockerfile
+    container_name: webscraper
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=${SCRAPER_PORT}
+    volumes:
+      - ./webscraper:/app
+    depends_on:
+      - qdrant
+    networks:
+      - network
+    ports:
+      - "${SCRAPER_PORT}:${SCRAPER_PORT}"
+
   client:
     build:
       context: ./client
