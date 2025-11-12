@@ -14,4 +14,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 EXPOSE 55555
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "app.main"]

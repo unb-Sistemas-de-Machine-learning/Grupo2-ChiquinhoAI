@@ -27,7 +27,9 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - QDRANT_URL=http://qdrant:${QDRANT_PORT}
-      - PORT=${SERVER_PORT}
+      - SERVER_PORT=${SERVER_PORT}
+    env_file:
+      - ./server/.env
     volumes:
       - ./server:/app
     depends_on:
