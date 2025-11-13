@@ -8,10 +8,10 @@ from app.rag import RAGService
 
 @lru_cache
 def get_llm() -> GeminiLLM:
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GOOGLE_API_KEY")
 
     if not api_key:
-        raise ValueError("GEMINI_API_KEY is not set in environment")
+        raise ValueError("GOOGLE_API_KEY is not set in environment")
 
     return GeminiLLM(api_key=api_key)
 

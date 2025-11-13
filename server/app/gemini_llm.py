@@ -7,13 +7,9 @@ logger = logging.getLogger(__name__)
 
 class GeminiLLM(LanguageModel):
     def __init__(self, api_key: str, model_name: str = "gemini-flash-latest"):
-        try:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel(model_name)
-            logger.info(f"Serviço LLM inicializado com o modelo: {model_name}")
-        except Exception as e:
-            logger.error(f"Falha ao inicializar o modelo Gemini: {e}")
-            raise
+        genai.configure(api_key=api_key)
+        self.model = genai.GenerativeModel(model_name)
+        logger.info(f"Serviço LLM inicializado com o modelo: {model_name}")
 
     def generate_response(self, prompt: str) -> str:
         try:
