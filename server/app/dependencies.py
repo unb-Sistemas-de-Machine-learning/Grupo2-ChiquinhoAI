@@ -1,28 +1,29 @@
-import os
 from functools import lru_cache
 from fastapi import Depends
+from app.config import get_settings
 from app.gemini_llm import GeminiLLM
 from app.qdrant import QdrantVectorStore
 from app.rag import RAGService
+from app.interfaces.language_model import LanguageModel
+from app.interfaces.vector_store import VectorStore
 
 
 @lru_cache
-def get_llm() -> GeminiLLM:
-    api_key = os.getenv("GOOGLE_API_KEY")
-
-    if not api_key:
-        raise ValueError("GOOGLE_API_KEY is not set in environment")
-
-    return GeminiLLM(api_key=api_key)
+def get_llm() -> LanguageModel:
+    settings = get_settings()
+    return GeminiLLM(
+        api_key=settings.google_api_key, model_name=settings.gemini_model_name
+    )
 
 
 @lru_cache
-def get_vector_store() -> QdrantVectorStore:
-    return QdrantVectorStore(url=os.getenv("QDRANT_URL", "http://localhost:6333"))
+def get_vector_store() -> VectorStore:
+    settings = get_settings()
+    return QdrantVectorStore(url=settings.qdrant_url)
 
 
 def get_rag_service(
-    llm: GeminiLLM = Depends(get_llm),
-    vector_store: QdrantVectorStore = Depends(get_vector_store),
+    llm: LanguageModel = Depends(get_llm),
+    vector_store: VectorStore = Depends(get_vector_store),
 ) -> RAGService:
     return RAGService(llm=llm, vector_store=vector_store)
