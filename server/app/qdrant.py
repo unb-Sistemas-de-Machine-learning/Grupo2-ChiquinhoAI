@@ -14,7 +14,7 @@ class QdrantVectorStore:
         url: str,
         api_key: str | None = None,
         llm: GeminiLLM = None,
-        collection_name: str = "Chiquinho_ai"
+        collection_name: str = "ChiquinhoAI"
     ):
         self.collection_name = collection_name
 

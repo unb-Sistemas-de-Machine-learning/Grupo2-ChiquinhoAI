@@ -3,5 +3,4 @@ uvicorn
 qdrant-client
 google-generativeai
 pydantic-settings
-sentence-transformers>=2.2.2
 numpy

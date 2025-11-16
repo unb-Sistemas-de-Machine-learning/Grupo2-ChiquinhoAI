@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 displayTypingIndicator();
 
-                const API_BASE = "http://localhost:5555";
+                const API_BASE = "http://localhost:55555";
                 const url = `${API_BASE}/response?pergunta=` + encodeURIComponent(pergunta);
                 const resposta = await fetch(url);
             

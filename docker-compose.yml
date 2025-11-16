@@ -47,10 +47,12 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - PORT=${SCRAPER_PORT}
+      - SERVER_URL=http://server:${SERVER_PORT}
     volumes:
       - ./webscraper:/app
     depends_on:
       - qdrant
+      - server
     networks:
       - network
     ports:
