@@ -16,5 +16,5 @@ class GeminiLLM(LanguageModel):
             response = self.model.generate_content(prompt)
             return response.text
         except Exception as e:
-            logger.error(f"Erro ao chamar a API Gemini: {e}")
-            return "Desculpe, ocorreu um erro ao processar sua solicitação."
+            logger.error(f"Erro ao chamar a API Gemini: {e}", exc_info=True)
+            return f"Erro ao processar: {str(e)[:200]}"

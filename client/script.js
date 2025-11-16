@@ -14,11 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         userInput.value = "";
 
-        try {
-            displayTypingIndicator();
+            try {
+                displayTypingIndicator();
 
-            const url = "http://localhost:55555/response?pergunta=" + encodeURIComponent(pergunta);
-            const resposta = await fetch(url);
+                const API_BASE = "http://localhost:5555";
+                const url = `${API_BASE}/response?pergunta=` + encodeURIComponent(pergunta);
+                const resposta = await fetch(url);
             
             if (!resposta.ok) {
                 throw new Error(`Erro na rede: ${resposta.statusText}`);

@@ -167,6 +167,11 @@ venv.bak/
 # mkdocs documentation
 /site
 
+.qdrant_storage/
+*.db
+*.sqlite
+*.sqlite3
+
 # mypy
 .mypy_cache/
 .dmypy.json
