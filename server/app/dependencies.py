@@ -12,14 +12,22 @@ from app.interfaces.vector_store import VectorStore
 def get_llm() -> LanguageModel:
     settings = get_settings()
     return GeminiLLM(
-        api_key=settings.google_api_key, model_name=settings.gemini_model_name
+        api_key=settings.google_api_key,
+        model_name=settings.gemini_model_name
     )
 
 
 @lru_cache
-def get_vector_store() -> VectorStore:
+def get_vector_store(
+    llm: GeminiLLM = Depends(get_llm),
+) -> VectorStore:
     settings = get_settings()
-    return QdrantVectorStore(url=settings.qdrant_url)
+    return QdrantVectorStore(
+        url=settings.qdrant_url,
+        api_key=settings.qdrant_key,
+        llm=llm,
+        collection_name="ChiquinhoAI"
+    )
 
 
 def get_rag_service(
