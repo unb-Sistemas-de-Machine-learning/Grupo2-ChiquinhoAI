@@ -18,3 +18,15 @@ class GeminiLLM(LanguageModel):
         except Exception as e:
             logger.error(f"Erro ao chamar a API Gemini: {e}")
             return "Desculpe, ocorreu um erro ao processar sua solicitação."
+
+    def embed_text(self, text: str) -> list[float]:
+        try:
+            result = genai.embed_content(
+                model="models/text-embedding-004",
+                content=text
+            )
+            logger.info(f"Embedding (5 valores): {result['embedding'][:5]} ...")
+            return result["embedding"]
+        except Exception as e:
+            logger.error(f"Erro ao gerar embedding: {e}")
+            return []

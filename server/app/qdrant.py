@@ -1,18 +1,67 @@
-from typing import List, Optional
+from typing import List
 from qdrant_client import QdrantClient
-from app.interfaces.vector_store import VectorStore
+from qdrant_client.http.models import (
+    VectorParams,
+    Distance,
+    PointStruct
+)
+from app.gemini_llm import GeminiLLM
 
 
-class QdrantVectorStore(VectorStore):
-    def __init__(self, url: str, api_key: Optional[str] = None):
-        self.url = url
-        self.qdrant = QdrantClient(url=self.url, api_key=api_key)
+class QdrantVectorStore:
+    def __init__(
+        self,
+        url: str,
+        api_key: str | None = None,
+        llm: GeminiLLM = None,
+        collection_name: str = "Chiquinho_ai"
+    ):
+        self.collection_name = collection_name
 
-    def search(self, query: str, top_k: int = 3) -> List[str]:
-        # TODO: implementar busca no banco de dados vetorial.
-        mock_document = (
-            "FastAPI é um framework moderno de Python para criar APIs rápidas, "
-            "tipadas e assíncronas. Ele é amplamente usado para desenvolvimento web "
-            "e microserviços, e permite gerar documentação automática via OpenAPI."
+        if llm is None:
+            raise ValueError("É necessário fornecer um GeminiLLM para gerar embeddings.")
+
+        self.llm = llm
+        self.embedding_size = 768
+
+        self.qdrant = QdrantClient(
+            url=url,
+            api_key=api_key or None,
+            check_compatibility=False
         )
-        return [mock_document for _ in range(top_k)]
+
+        if not self.qdrant.collection_exists(self.collection_name):
+            self.qdrant.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=VectorParams(
+                    size=self.embedding_size,
+                    distance=Distance.COSINE
+                ),
+            )
+
+    def embed(self, text: str) -> List[float]:
+        return self.llm.embed_text(text)
+
+    def add_document(self, doc_id: str, text: str):
+        vector = self.embed(text)
+
+        point = PointStruct(
+            id=doc_id,
+            vector=vector,
+            payload={"text": text},
+        )
+
+        self.qdrant.upsert(
+            collection_name=self.collection_name,
+            points=[point]
+        )
+
+    def search(self, query: str, top_k: int = 4):
+        vector = self.embed(query)
+
+        result = self.qdrant.search(
+            collection_name=self.collection_name,
+            query_vector=vector,
+            limit=top_k
+        )
+        return [hit.payload["text"] for hit in result]
