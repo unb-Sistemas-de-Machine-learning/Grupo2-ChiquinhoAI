@@ -13,41 +13,56 @@ from app.dependencies import get_llm
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "ChiquinhoAI"
+MAX_CHARS = 3500
 
 llm = get_llm()
 
-def _load_source_files(source_paths: List[str]) -> List[dict]:
-    items = []
-    for path in source_paths:
-        if os.path.exists(path):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    if isinstance(data, list):
-                        items.extend(data)
-            except Exception:
-                logger.exception(f"Falha ao ler arquivo JSON: {path}")
-        else:
-            logger.warning(f"Arquivo não encontrado: {path}")
-    return items
+
+def split_text(text: str, max_chars: int = MAX_CHARS) -> List[str]:
+    text = text.strip()
+    if len(text) <= max_chars:
+        return [text]
+
+    chunks = []
+    start = 0
+
+    while start < len(text):
+        end = start + max_chars
+        chunk = text[start:end]
+        chunks.append(chunk)
+        start = end
+
+    return chunks
+
 
 def build_records_from_docs(docs: List[dict]) -> List[dict]:
     records = []
-    for d in docs:
-        text = (
-            (d.get("title") or "") + "\n\n" + (d.get("content_text") or "")
-        ).strip()
-        payload = {
-            "title": d.get("title"),
-            "url": d.get("url"),
-            "publication_date": d.get("publication_date"),
-            "source": d.get("source"),
-            "excerpt": d.get("metadata", {}).get("excerpt"),
-            "content_text": d.get("content_text"),
-        }
 
-        records.append({"text": text, "payload": payload})
+    for d in docs:
+        full_text = f"{d.get('title','')}\n\n{d.get('content_text','')}".strip()
+
+        chunks = split_text(full_text, MAX_CHARS)
+
+        for idx, chunk in enumerate(chunks):
+
+            payload = {
+                "title": d.get("title"),
+                "url": d.get("url"),
+                "publication_date": d.get("publication_date"),
+                "source": d.get("source"),
+                "excerpt": d.get("metadata", {}).get("excerpt"),
+                "content_text": chunk,
+                "chunk": idx,
+                "total_chunks": len(chunks)
+            }
+
+            records.append({
+                "text": chunk,
+                "payload": payload
+            })
+
     return records
+
 
 def ingest(
     docs: List[dict],
@@ -57,58 +72,70 @@ def ingest(
     settings = get_settings()
     qdrant_api_key = os.getenv("QDRANT_API_KEY")
     client = QdrantClient(url=settings.qdrant_url, api_key=qdrant_api_key)
+
     records = build_records_from_docs(docs)
+
     if not records:
         logger.warning("Nenhum documento para ingerir.")
         return
 
-    logger.info(f"Gerando embeddings com Gemini para {len(records)} documentos...")
+    logger.info(f"Total após chunking: {len(records)} pedaços indexáveis.")
+
     vectors = []
+    final_records = []
+
     for rec in records:
-        vec = llm.embed_text(rec["text"])
-        if not vec:
-            logger.error("Falha ao gerar embedding, pulando documento.")
+        try:
+            vec = llm.embed_text(rec["text"])
+        except Exception as e:
+            logger.error(f"Erro ao gerar embedding: {e}")
             continue
+
+        if not vec:
+            logger.error("Falha ao gerar embedding, pulando chunk.")
+            continue
+
         vectors.append(vec)
+        final_records.append(rec)
+
     if not vectors:
-        logger.error("Nenhum embedding foi gerado. Abortando.")
+        logger.error("Nenhum embedding foi gerado. Abortando ingest.")
         return
 
     vector_size = len(vectors[0])
     collections = client.get_collections().collections
-    collection_exists = any(c.name == COLLECTION_NAME for c in collections)
+    exists = any(c.name == COLLECTION_NAME for c in collections)
 
-    if recreate or not collection_exists:
+    if recreate or not exists:
         client.recreate_collection(
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE)
         )
-        logger.info(f"Coleção '{COLLECTION_NAME}' criada/recriada com dimensão={vector_size}")
+        logger.info(f"Coleção criada com dimensão={vector_size}")
         next_id = 1
     else:
         info = client.get_collection(COLLECTION_NAME)
         next_id = info.points_count + 1
-        logger.info(
-            f"Coleção '{COLLECTION_NAME}' existente com {info.points_count} pontos. "
-            f"Novos IDs iniciam em {next_id}."
-        )
 
     points = []
-    for i, (rec, vec) in enumerate(zip(records, vectors)):
+    for i, (rec, vec) in enumerate(zip(final_records, vectors)):
         point = {
             "id": next_id + i,
             "vector": vec,
             "payload": rec["payload"]
         }
         points.append(point)
+
         if len(points) >= batch_size:
             client.upsert(collection_name=COLLECTION_NAME, points=points)
-            logger.info(f"Batch upsert ({len(points)}) OK")
+            logger.info(f"Upsert batch ({len(points)}) OK")
             points = []
+
     if points:
         client.upsert(collection_name=COLLECTION_NAME, points=points)
-        logger.info(f"Batch final ({len(points)}) OK")
-    logger.info(f"Total de {len(vectors)} documentos adicionados ao Qdrant.")
+        logger.info(f"Upsert final ({len(points)}) OK")
+
+    logger.info(f"INGEST FINALIZADO — {len(final_records)} chunks inseridos.")
 
 
 def main():
@@ -118,10 +145,17 @@ def main():
         os.path.join(base, "deg.json"),
         os.path.join(base, "unb_data.json"),
     ]
-    docs = _load_source_files(possible_files)
+
+    docs = []
+    for p in possible_files:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                docs.extend(json.load(f))
+
     if not docs:
-        logger.error("Nenhum documento encontrado. Abortando.")
+        logger.error("Nenhum documento encontrado.")
         return
+
     ingest(docs, recreate=True)
 
 

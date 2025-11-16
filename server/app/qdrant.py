@@ -64,4 +64,4 @@ class QdrantVectorStore:
             query_vector=vector,
             limit=top_k
         )
-        return [hit.payload["text"] for hit in result]
+        return [hit.payload.get("text", "") for hit in result]

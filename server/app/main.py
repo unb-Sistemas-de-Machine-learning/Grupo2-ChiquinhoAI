@@ -31,5 +31,5 @@ async def ingest_docs(docs: list[dict]):
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("SERVER_PORT", 55555))
+    port = int(os.getenv("SERVER_PORT", 5555))
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
