@@ -14,7 +14,13 @@ A comunidade acadêmica enfrenta um **alto esforço para obter informações con
 
 A solução consiste em um **Chatbot baseado no padrão RAG (Retrieval-Augmented Generation)**. Um agente de Inteligência Artificial será responsável por coletar e processar continuamente os documentos de fontes oficiais da UnB. As informações serão indexadas em uma base de conhecimento vetorial, permitindo que o chatbot encontre os trechos mais relevantes para a pergunta de um usuário e utilize um Modelo de Linguagem Grande (LLM) para gerar uma resposta coesa, precisa e com a citação das fontes originais.
 
-## **4. Escopo do Módulo 1**
+## **4. Métricas de sucesso (KPI)**
+* 90% dos usuários enviando no mínimo 4 mensagens.
+* 90% das respostas tem que estar contido no banco de dados.
+
+Com essas métricas consguimos assumir que a aplicação está conseguindo reter os usuários e que os usuários estão consguindo sanar suas dúvidas, pois as respostas geradas são com base nas informações contidas na base de dados.
+
+## **5. Escopo do Módulo 1**
 
 Para garantir um desenvolvimento focado e iterativo, o escopo deste módulo inicial está definido como:
 
@@ -35,7 +41,7 @@ Esta abordagem permite criar uma base de conhecimento altamente relevante e prec
 * Integração com outras plataformas além do Telegram (ex: WhatsApp).
 * Um painel de administração (dashboard) completo.
 
-## **5. Tecnologias Mapeadas**
+## **6. Tecnologias Mapeadas**
 
 * **Plataforma de Interação:** Telegram
 * **Linguagem de Programação:** Python
@@ -43,7 +49,7 @@ Esta abordagem permite criar uma base de conhecimento altamente relevante e prec
 * **Modelos de LLM:** Gemini Pro - Google Cloud
 * **Banco de Dados Vetorial:** Qdrant
 
-## **6. Metodologia e Ferramentas**
+## **7. Metodologia e Ferramentas**
 
 Para a concepção do projeto, foram aplicadas as seguintes ferramentas e frameworks de design de produto e engenharia de software:
 
@@ -52,7 +58,7 @@ Para a concepção do projeto, foram aplicadas as seguintes ferramentas e framew
 * **The Machine Learning Canvas:** Para estruturar a solução sob a ótica de um produto de IA.
 * **Levantamento de Requisitos:** Definição de Requisitos Funcionais e Não Funcionais para guiar o desenvolvimento.
 
-## **7. Próximos Passos**
+## **8. Próximos Passos**
 
 Com a conclusão deste módulo de concepção, o próximo passo é iniciar o **desenvolvimento do Produto Mínimo Viável (MVP)**. As atividades prioritárias incluem a configuração da infraestrutura, a implementação do agente de coleta de dados para as fontes prioritárias e o desenvolvimento do fluxo de conversação básico no Telegram.
 
@@ -64,7 +70,8 @@ Com a conclusão deste módulo de concepção, o próximo passo é iniciar o **d
 | Data       | Versão | Descrição            | Autores                                   |
 |------------|--------|----------------------|-------------------------------------------|
 | 02/10/2025 | `1.0`  | Criação do documento | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
-| 07/10/2025 | `1.1`  | Atulaização da introdução e tecnologias mapeadas | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
+| 07/10/2025 | `1.1`  | Atualização da introdução e tecnologias mapeadas | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
+| 08/12/2025 | `1.2`  | Adicionando métricas de sucesso | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
 
 
 </div>

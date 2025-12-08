@@ -17,7 +17,7 @@ O presente documento estabelece a fundação para o desenvolvimento do Assistent
 
 #### **Requisitos Não Funcionais (RNF)**
 
-* **RNF01: Desempenho (Latência)**: O tempo de resposta para uma pergunta do usuário não deve exceder 15 segundos em 90% das requisições.
+* **RNF01: Desempenho (Latência)**: O tempo de resposta para uma pergunta do usuário não deve exceder 5 segundos em 90% das requisições.
 
 * **RNF02: Disponibilidade**: O serviço do chatbot deve estar disponível para os usuários 99,5% do tempo.
 * **RNF03: Usabilidade**: A linguagem e a interface do bot devem ser intuitivas, claras e de fácil compreensão para o público-alvo.
@@ -27,6 +27,7 @@ O presente documento estabelece a fundação para o desenvolvimento do Assistent
 * **RNF07: Compatibilidade**: O chatbot deve funcionar corretamente nas versões mais recentes dos clientes oficiais do Telegram.
 * **RNF08: Acessibilidade**: O texto e a estrutura das respostas devem seguir boas práticas de acessibilidade, sendo compatíveis com leitores de tela.
 * **RNF09: Identidade e Tom de Voz**: O chatbot deve manter um tom de voz consistente (prestativo, formal, mas claro) em todas as suas interações.
+* **RNF10: Usabilidade**: O retorno da resposta não pode ter mais do que 10 linhas.
 
 ---
 
@@ -41,7 +42,8 @@ O presente documento estabelece a fundação para o desenvolvimento do Assistent
 | Data       | Versão | Descrição            | Autores                                   |
 |------------|--------|----------------------|-------------------------------------------|
 | 24/09/2025 | `1.0`  | Criação do documento | [Cássio Reis](https://github.com/csreis72) |
-| 07/10/2025 | `1.1`  | Atulaização dos requisitos | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
+| 07/10/2025 | `1.1`  | Atualização dos requisitos | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
+| 07/10/2025 | `1.1`  | Atualização dos requisitos não funcionais (01 e 10) | [Vinicius Santos](https://github.com/ViniciussdeOliveira) |
 
 </div>
 
