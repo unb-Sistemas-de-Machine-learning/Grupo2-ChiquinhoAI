@@ -59,9 +59,12 @@ class QdrantVectorStore:
     def search(self, query: str, top_k: int = 4):
         vector = self.embed(query)
 
-        result = self.qdrant.search(
+        result = self.qdrant.query_points(
             collection_name=self.collection_name,
-            query_vector=vector,
+            query=vector,
             limit=top_k
         )
-        return [hit.payload.get("text", "") for hit in result]
+        # print(result)
+
+        return [hit.payload.get("content_text", "") for hit in result.points]
+

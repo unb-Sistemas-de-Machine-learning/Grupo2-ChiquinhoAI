@@ -25,8 +25,20 @@ class GeminiLLM(LanguageModel):
                 model="models/text-embedding-004",
                 content=text
             )
-            logger.info(f"Embedding (5 valores): {result['embedding'][:5]} ...")
-            return result["embedding"]
+
+            emb = (
+                result.get("embedding", {}).get("values")
+                if isinstance(result.get("embedding"), dict)
+                else result.get("embedding")
+            )
+
+            if not emb:
+                raise ValueError("Embedding vazio ou inválido")
+
+            logger.info(f"Embedding gerado (5 valores): {emb[:5]} ...")
+            return emb
+
         except Exception as e:
             logger.error(f"Erro ao gerar embedding: {e}")
             return []
+

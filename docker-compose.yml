@@ -1,6 +1,6 @@
 services:
   qdrant:
-    image: qdrant/qdrant:v1.11.0
+    image: qdrant/qdrant:v1.16.1
     container_name: qdrant
     ports:
       - "${QDRANT_PORT}:${QDRANT_PORT}"
@@ -74,6 +74,23 @@ services:
       - server
     networks:
       - network
+
+  telegram:
+    build:
+      context: ./telegram_bot
+      dockerfile: Dockerfile
+    container_name: telegram
+    environment:
+      - PORT=${TELEGRAM_PORT}
+    volumes:
+      - ./telegram_bot:/app
+    ports:
+      - "${TELEGRAM_PORT}:${TELEGRAM_PORT}"
+    depends_on:
+      - server
+    networks:
+      - network
+
 
 networks:
   network:
