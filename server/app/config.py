@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     gemini_model_name: str = "gemini-flash-latest"
     qdrant_key: str | None = None
     qdrant_url: str
+    debug: bool = False
 
     class Config:
         env_file = ".env"

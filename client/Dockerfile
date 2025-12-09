@@ -8,7 +8,7 @@ COPY . .
 
 EXPOSE 8080
 
-ENV HOST=0.0.0.0
 ENV PORT=8080
+ENV HOST=0.0.0.0
 
-CMD ["sh", "-c", "live-server /usr/src/app/client --host=0.0.0.0 --port=8080 --entry-file=index.html"]
+CMD ["sh", "-c", "live-server /usr/src/app --host=$HOST --port=$PORT --entry-file=index.html"]

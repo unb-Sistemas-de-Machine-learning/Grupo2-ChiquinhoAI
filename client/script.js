@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 displayTypingIndicator();
 
-                const API_BASE = "http://server:55555";
+                const isProduction = window.APP_ENV.IS_PROD === 'true';
+
+                const API_BASE = isProduction ? "/api" : "http://localhost:55555";
                 const url = `${API_BASE}/response?pergunta=` + encodeURIComponent(pergunta);
                 const resposta = await fetch(url);
             
