@@ -11,7 +11,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . .
+COPY app ./app
+
 EXPOSE 44444
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "app.main"]

@@ -53,7 +53,7 @@ services:
       - server
     networks:
       - network
-    restart: unless-stopped
+    restart: no
 
   client:
     build:

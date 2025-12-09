@@ -40,7 +40,7 @@ class Document(BaseModel):
     """Modelo de documento a ser inserido no Qdrant"""
     title: str
     url: str
-    publication_date: str
+    publication_date: str | None = None
     source: str
     content_text: str
     metadata: Dict[str, Any] | None = None
