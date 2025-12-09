@@ -58,4 +58,4 @@ class QdrantVectorStore(VectorStore):
             limit=top_k
         )
 
-        return [hit.payload.get("text", "") for hit in result.points]
+        return [hit.payload.get("content_text", hit.payload.get("excerpt")) for hit in result.points]

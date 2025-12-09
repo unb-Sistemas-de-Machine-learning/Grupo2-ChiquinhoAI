@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-API_URL = os.getenv("API_URL", "http://localhost:5555/response")
+API_URL = os.getenv("API_URL", "http://localhost:55555/response")
 
 PORT = int(os.environ.get('PORT', 8443))
 WEBHOOK_URL = os.getenv("WEBHOOK_URL") 
