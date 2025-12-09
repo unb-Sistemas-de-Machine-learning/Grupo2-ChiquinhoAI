@@ -91,7 +91,7 @@ async def ingest_docs(
     docs: List[Document],
     embedder: Embedder = Depends(get_embedder)  # injeta o embedder
 ):
-    ingest([doc.model_dump() for doc in docs], embedder=embedder, recreate=True)
+    ingest([doc.model_dump() for doc in docs], embedder=embedder, recreate=False)
     return {"status": "ok", "count": len(docs)}
 
 

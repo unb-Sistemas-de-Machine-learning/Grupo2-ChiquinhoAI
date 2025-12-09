@@ -96,12 +96,11 @@ def scrape(query="monitoria", pages_limit=1) -> List[Document]:
             details = get_post_details(post_url)
             
             doc = Document(
-                id="", # Auto-generated
                 title=post_title,
                 url=post_url,
                 source="deg.unb.br",
                 content_text=details["text"],
-                publication_date=parse_pt_date(date_str), # Usa o utilitário
+                publication_date=parse_pt_date(date_str),
                 attachments=details["attachments"],
                 metadata={
                     "excerpt": clean_text(excerpt_tag.get_text()) if excerpt_tag else "",

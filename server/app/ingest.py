@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import uuid
 from typing import List
 
 from qdrant_client import QdrantClient
@@ -58,6 +59,12 @@ def build_records_from_docs(docs: List[dict]) -> List[dict]:
     return records
 
 
+def make_point_id(url: str, chunk_idx: int) -> str:
+    """Gera um UUID5 determinístico baseado na URL e no número do chunk."""
+    raw = f"{url}-{chunk_idx}"
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, raw))
+
+
 def ingest(
     docs: List[dict],
     embedder: Embedder,
@@ -106,18 +113,20 @@ def ingest(
             vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE)
         )
         logger.info(f"Coleção criada com dimensão={vector_size}")
-        next_id = 1
-    else:
-        info = client.get_collection(COLLECTION_NAME)
-        next_id = info.points_count + 1
 
     points = []
-    for i, (rec, vec) in enumerate(zip(final_records, vectors)):
+    for rec, vec in zip(final_records, vectors):
+        url = rec["payload"]["url"]
+        chunk_idx = rec["payload"]["chunk"]
+
+        point_id = make_point_id(url, chunk_idx)
+
         point = {
-            "id": next_id + i,
+            "id": point_id,
             "vector": vec,
             "payload": rec["payload"]
         }
+
         points.append(point)
 
         if len(points) >= batch_size:

@@ -62,7 +62,6 @@ def process_link(link_info: dict) -> Document:
     
     # O SAA raramente tem data explícita no HTML, deixamos None ou usamos data atual se crítico
     return Document(
-        id="", # Será gerado automaticamente pelo validador
         title=title,
         url=url,
         source="saa.unb.br",
