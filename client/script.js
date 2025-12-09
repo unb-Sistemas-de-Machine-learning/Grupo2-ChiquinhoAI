@@ -43,7 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function displayMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `${sender}-message`);
-        messageElement.innerText = text;
+        if (sender === 'ai') {
+            messageElement.innerHTML = marked.parse(text);
+        } else {
+            messageElement.innerText = text;
+        }
         
         chatContainer.appendChild(messageElement);
 

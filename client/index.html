@@ -86,6 +86,42 @@
         #send-button:hover {
             background-color: #0056b3;
         }
+
+        .message p {
+            margin: 0 0 10px 0;
+        }
+
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message strong {
+            font-weight: 700;
+        }
+
+        .message ul, .message ol {
+            margin: 5px 0 10px 20px;
+            padding: 0;
+        }
+
+        .message li {
+            margin-bottom: 5px;
+        }
+        
+        .message code {
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .message pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +139,7 @@
         <button id="send-button">Enviar</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="script.js"></script>
     <script>
         window.APP_ENV = {
