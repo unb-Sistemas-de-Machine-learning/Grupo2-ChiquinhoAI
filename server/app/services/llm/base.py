@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class LanguageModel(ABC):
+class LLM(ABC):
     """Classe base abstrata para qualquer modelo de linguagem (LLM)."""
 
     @abstractmethod

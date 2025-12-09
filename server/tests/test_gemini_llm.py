@@ -1,9 +1,9 @@
 from unittest.mock import patch
-from app.gemini_llm import GeminiLLM
+from app.services.llm.gemini_llm import GeminiLLM
 
 
 def test_gemini_llm_generate_response_success():
-    with patch("app.gemini_llm.genai.GenerativeModel") as MockModel:
+    with patch("app.services.llm.gemini_llm.genai.GenerativeModel") as MockModel:
         mock_instance = MockModel.return_value
         mock_instance.generate_content.return_value.text = "resposta simulada"
 
@@ -15,7 +15,7 @@ def test_gemini_llm_generate_response_success():
 
 
 def test_gemini_llm_generate_response_error():
-    with patch("app.gemini_llm.genai.GenerativeModel") as MockModel:
+    with patch("app.services.llm.gemini_llm.genai.GenerativeModel") as MockModel:
         mock_instance = MockModel.return_value
         mock_instance.generate_content.side_effect = Exception("API falhou")
 

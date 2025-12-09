@@ -1,11 +1,11 @@
-from app.interfaces.language_model import LanguageModel
-from app.interfaces.vector_store import VectorStore
+from app.services.llm.base import LLM
+from app.services.vector_store.base import VectorStore
 
 
 class RAGService:
     """Orquestra o fluxo RAG (busca vetorial + geração de resposta)."""
 
-    def __init__(self, llm: LanguageModel, vector_store: VectorStore):
+    def __init__(self, llm: LLM, vector_store: VectorStore):
         self.llm = llm
         self.vector_store = vector_store
 

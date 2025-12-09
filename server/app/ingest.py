@@ -7,15 +7,13 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 
 from app.config import get_settings
-from app.gemini_llm import GeminiLLM
-from app.dependencies import get_llm
+from app.services.embedder.base import Embedder
+from app.dependencies import get_embedder
 
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "ChiquinhoAI"
 MAX_CHARS = 3500
-
-llm = get_llm()
 
 
 def split_text(text: str, max_chars: int = MAX_CHARS) -> List[str]:
@@ -25,11 +23,9 @@ def split_text(text: str, max_chars: int = MAX_CHARS) -> List[str]:
 
     chunks = []
     start = 0
-
     while start < len(text):
         end = start + max_chars
-        chunk = text[start:end]
-        chunks.append(chunk)
+        chunks.append(text[start:end])
         start = end
 
     return chunks
@@ -40,11 +36,9 @@ def build_records_from_docs(docs: List[dict]) -> List[dict]:
 
     for d in docs:
         full_text = f"{d.get('title','')}\n\n{d.get('content_text','')}".strip()
-
         chunks = split_text(full_text, MAX_CHARS)
 
         for idx, chunk in enumerate(chunks):
-
             payload = {
                 "title": d.get("title"),
                 "url": d.get("url"),
@@ -66,6 +60,7 @@ def build_records_from_docs(docs: List[dict]) -> List[dict]:
 
 def ingest(
     docs: List[dict],
+    embedder: Embedder,
     batch_size: int = 64,
     recreate: bool = False,
 ):
@@ -74,7 +69,6 @@ def ingest(
     client = QdrantClient(url=settings.qdrant_url, api_key=qdrant_api_key)
 
     records = build_records_from_docs(docs)
-
     if not records:
         logger.warning("Nenhum documento para ingerir.")
         return
@@ -86,7 +80,7 @@ def ingest(
 
     for rec in records:
         try:
-            vec = llm.embed_text(rec["text"])
+            vec = embedder.embed_text(rec["text"])
         except Exception as e:
             logger.error(f"Erro ao gerar embedding: {e}")
             continue
@@ -140,6 +134,9 @@ def ingest(
 
 def main():
     logging.basicConfig(level=logging.INFO)
+
+    embedder = get_embedder()
+
     base = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "webscraper"))
     possible_files = [
         os.path.join(base, "deg.json"),
@@ -156,7 +153,7 @@ def main():
         logger.error("Nenhum documento encontrado.")
         return
 
-    ingest(docs, recreate=True)
+    ingest(docs, embedder=embedder, recreate=True)
 
 
 if __name__ == "__main__":

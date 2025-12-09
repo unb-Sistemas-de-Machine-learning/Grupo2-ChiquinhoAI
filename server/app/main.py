@@ -2,13 +2,16 @@ import os
 import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 from typing import List, Dict, Any
 
-from app.rag import RAGService
-from app.dependencies import get_rag_service
+from app.services.rag import RAGService
+from app.dependencies import get_embedder, get_rag_service
 from app.ingest import ingest
+from app.config import get_settings
+from app.services.embedder.base import Embedder
 
+settings = get_settings()
 
 app = FastAPI(
     title="ChiquinhoAI API",
@@ -20,7 +23,7 @@ app = FastAPI(
 - `/response`: Gera uma resposta contextualizada usando RAG (Retriever-Augmented Generation)
 - `/ingest`: Insere novos documentos no vetor store (Qdrant)
 """,
-
+    debug=settings.debug
 )
 
 
@@ -35,16 +38,37 @@ app.add_middleware(
 
 class Document(BaseModel):
     """Modelo de documento a ser inserido no Qdrant"""
-    title: str = Field(..., example="Monitoria")
-    url: str = Field(..., example="https://deg.unb.br/monitoria/")
-    publication_date: str = Field(..., example="29 de agosto de 2024")
-    source: str = Field(..., example="deg.unb.br")
-    content_text: str = Field(..., example="Texto completo do artigo...")
-    metadata: Dict[str, Any] | None = Field(default=None, example={"excerpt": "Resumo do conteúdo"})
+    title: str
+    url: str
+    publication_date: str
+    source: str
+    content_text: str
+    metadata: Dict[str, Any] | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "title": "Monitoria",
+                "url": "https://deg.unb.br/monitoria/",
+                "publication_date": "29 de agosto de 2024",
+                "source": "deg.unb.br",
+                "content_text": "Texto completo do artigo...",
+                "metadata": {"excerpt": "Resumo do conteúdo"}
+            }
+        }
+    )
 
 
 class ResponseOutput(BaseModel):
-    resposta: str = Field(..., example="A monitoria é uma atividade acadêmica oferecida pela UnB...")
+    resposta: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "resposta": "A monitoria é uma atividade acadêmica oferecida pela UnB..."
+            }
+        }
+    )
 
 
 @app.get(
@@ -63,8 +87,11 @@ def get_response(pergunta: str, rag: RAGService = Depends(get_rag_service)):
     summary="Inserir documentos no Qdrant",
     description="Realiza a ingestão de uma lista de documentos no vetor store (Qdrant), gerando embeddings e salvando os metadados.",
 )
-async def ingest_docs(docs: List[Document]):
-    ingest([doc.dict() for doc in docs], recreate=True)
+async def ingest_docs(
+    docs: List[Document],
+    embedder: Embedder = Depends(get_embedder)  # injeta o embedder
+):
+    ingest([doc.model_dump() for doc in docs], embedder=embedder, recreate=True)
     return {"status": "ok", "count": len(docs)}
 
 

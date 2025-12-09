@@ -1,6 +1,6 @@
-from app.interfaces.language_model import LanguageModel
-from app.interfaces.vector_store import VectorStore
-from app.rag import RAGService
+from app.services.llm.base import LLM
+from app.services.vector_store.base import VectorStore
+from app.services.rag import RAGService
 
 
 def test_generate_answer_calls_vector_store_search(
@@ -13,7 +13,7 @@ def test_generate_answer_calls_vector_store_search(
 
 
 def test_generate_answer_calls_llm_with_correct_prompt(
-    rag_service: RAGService, mock_llm: LanguageModel
+    rag_service: RAGService, mock_llm: LLM
 ):
     pergunta = "Explique FastAPI"
     rag_service.generate_answer(pergunta)

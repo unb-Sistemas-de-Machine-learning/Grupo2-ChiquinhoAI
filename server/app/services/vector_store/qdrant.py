@@ -1,28 +1,21 @@
 from typing import List
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import (
-    VectorParams,
-    Distance,
-    PointStruct
-)
-from app.gemini_llm import GeminiLLM
+from qdrant_client.http.models import VectorParams, Distance, PointStruct
+from app.services.vector_store.base import VectorStore
+from app.services.embedder.base import Embedder
 
-
-class QdrantVectorStore:
+class QdrantVectorStore(VectorStore):
     def __init__(
         self,
         url: str,
+        embedder: Embedder,
         api_key: str | None = None,
-        llm: GeminiLLM = None,
-        collection_name: str = "ChiquinhoAI"
+        collection_name: str = "ChiquinhoAI",
+        embedding_size: int = 768,
     ):
         self.collection_name = collection_name
-
-        if llm is None:
-            raise ValueError("É necessário fornecer um GeminiLLM para gerar embeddings.")
-
-        self.llm = llm
-        self.embedding_size = 768
+        self.embedding_size = embedding_size
+        self.embedder = embedder
 
         self.qdrant = QdrantClient(
             url=url,
@@ -40,7 +33,7 @@ class QdrantVectorStore:
             )
 
     def embed(self, text: str) -> List[float]:
-        return self.llm.embed_text(text)
+        return self.embedder.embed_text(text)
 
     def add_document(self, doc_id: str, text: str):
         vector = self.embed(text)
@@ -64,7 +57,5 @@ class QdrantVectorStore:
             query=vector,
             limit=top_k
         )
-        # print(result)
 
-        return [hit.payload.get("content_text", "") for hit in result.points]
-
+        return [hit.payload.get("text", "") for hit in result.points]
