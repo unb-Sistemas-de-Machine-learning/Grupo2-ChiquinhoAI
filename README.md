@@ -202,6 +202,26 @@ A aplicação é composta por 5 serviços principais:
 ---
 
 <center>
+  
+## Deploy do Modelo
+
+</center>
+
+O deploy da aplicação foi realizado na plataforma Railway e está disponível publicamente em: https://chiquinho-ai.up.railway.app/
+
+### Configuração no Railway
+
+Antes de tudo, é possível arrastar o arquivo `docker-compose.prod.yml` diretamente no canvas do Railway para importar os serviços. Em seguida, para cada serviço da aplicação, é necessário:
+- Importar o projeto do GitHub no Railway.
+- Selecionar o Dockerfile correto (Frontend: Dockerfile.prod; Backend, WebScraper e Telegram Bot: Dockerfile padrão)
+- Definir o root directory de cada serviço, pois o projeto é um monorepo
+- Configurar as variáveis de ambiente necessárias (ex.: chave da API, URLs internas, tokens)
+
+Por fim, defina o domínio e habilite o public networking apenas para o client (Frontend), enquanto os serviços internos se comunicam entre si pelas URLs internas.
+
+---
+
+<center>
 
 ## Histórico de Versão
 
